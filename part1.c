@@ -22,25 +22,25 @@ int main(int argc, char * argv[]){
  
     open_file = fopen(argv[1], "r");
     if(open_file == NULL){
-	perror("Error opening file!\n");
-	return 0;
+        perror("Error opening file!\n");
+        return 0;
     }
+
     amt_of_commands = 0;
-    pid_t * pid_arr = (pid_t *)malloc(sizeof(pid_t) * amt_of_commands);
+    pid_t * pid_arr[MAX_LENGTH];
     while(getline(&line, &len, open_file) != -1){
-	command_line token_buffer = str_filler(line, " ");
-	pid_arr[amt_of_commands] = fork();
-	if(pid_arr[amt_of_commands] == 0){
-	   printf("Child process created\n");
-	   amt_of_commands ++;
-	}
-	else if(pid_arr[amt_of_commands] > 0){
-	   printf("I'm the parent. Child ID is: %d\n", pid_arr[count]);
-	   amt_of_commands ++;
-	}
-	else{
-	   perror("Fork failed\n");
-	}
+        command_line token_buffer = str_filler(line, " ");
+        pid_arr[amt_of_commands] = fork();
+        if(pid_arr[amt_of_commands] == 0){
+            printf("Child process created\n");
+            amt_of_commands ++;
+        }
+        else if(pid_arr[amt_of_commands] > 0){
+            printf("I'm the parent. Child ID is: %d\n", pid_arr[amt_of_commands]);
+        }
+        else{
+            perror("Fork failed\n");
+        }
     }
     printf("here");
     free(pid_arr);
