@@ -12,10 +12,9 @@
 
  #ifndef STRING_PARSER_H_
  #define STRING_PARSER_H_
+#include <string.h> 
  
- 
- #define _GUN_SOURCE
- 
+#define _GNU_SOURCE 
  
  typedef struct
  {
