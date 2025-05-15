@@ -67,7 +67,7 @@ int main(int argc, char * argv[]){
 	        perror("waitpid failed");
 	    }
         else if(terminated_pid == pid_arr[i]){
-            printf("PARENT: Child process %d (PID: %d) terminated ", i, terminated_pid);
+            printf("PARENT: Child process %d (PID: %d) terminated\n", i, terminated_pid);
         }	
     }
     fclose(open_file);
