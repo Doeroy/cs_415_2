@@ -94,20 +94,41 @@ int main(int argc, char * argv[]){
 	        num_children_launched ++;
         }
         else{
-            perror("Fork failed\n");
+            perror("Fork failed");
             free_command_line(&token_buffer);
         }
     }
 
-    for(int i = 0; i < num_children_launched; i++){
-            kill(pid_arr[i], SIGUSR1);
-            printf("CHILD (PID: %d): SIGUSR1 signal sent, now calling exec()", num_children_launched);
-            kill(pid_arr[i], SIGSTOP);
-            printf("CHILD (PID: %d): SIGSTOP signal sent, now suspended", num_children_launched);
-            kill(pid_arr[i], SIGCONT);
-            printf("CHILD (PID: %d): SIGCONT signal sent, now waking up", num_children_launched);
+    if(num_children_launched > 0){
+        printf("PARENT (PID: %d): Sending SIGUSR1 signal", getpid());
+        for(int i = 0; i < num_children_launched; i++){
+            if(kill(pid_arr[i], SIGUSR1) == 0){
+                perror("PARENT: kill (SIGUSR1) failed");
+            }
+        }
+        sleep(1);
     }
 
+    if(num_children_launched > 0){
+        printf("PARENT (PID: %d): Sending SIGSTOP signal\n", getpid());
+        for(int i = 0; i < num_children_launched; i++){
+            if(kill(pid_arr[i], SIGSTOP) == -1){
+                perror("PARENT: kill(SIGSTOP) failed");
+            }
+        }
+        sleep(1);
+    }
+
+    if(num_children_launched > 0){
+        printf("PARENT (PID: %d): Sending SIGCONT signal\n", getpid());
+        for(int i = 0; i < num_children_launched; i++){
+            if(kill(pid_arr[i], SIGCONT) == -1){
+                perror("PARENT: kill(SIGCONT) failed");
+            }
+        }
+        sleep(1);
+    }
+            
     for(int i = 0; i < num_children_launched; i++){
     	int wstatus;
     	pid_t terminated_pid;
