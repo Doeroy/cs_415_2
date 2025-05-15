@@ -7,7 +7,6 @@
 #include <unistd.h>
 #include <errno.h>
 #include <sys/wait.h>
-#include <signal.h>
 #define MAX_LENGTH 1000
 
 int main(int argc, char * argv[]){
@@ -44,7 +43,7 @@ int main(int argc, char * argv[]){
                 free_command_line(&token_buffer);
 		        perror("Error with execvp()");
                 _exit(1);
-	        }
+	    }
         }
         else if(pid_arr[num_children_launched] > 0){
             printf("I'm the parent. Child ID is: %d\n", pid_arr[num_children_launched]);
@@ -65,7 +64,7 @@ int main(int argc, char * argv[]){
 	        perror("waitpid failed");
 	    }
         else if(terminated_pid == pid_arr[i]){
-            printf("PARENT: Child process %d (PID: %d) terminated \n", i, terminated_pid);
+            printf("PARENT: Child process %d (PID: %d) terminated ", i, terminated_pid);
         }	
     }
     fclose(open_file);
