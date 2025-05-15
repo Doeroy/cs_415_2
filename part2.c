@@ -29,7 +29,7 @@ int main(int argc, char * argv[]){
     }
     num_children_launched = 0;
     pid_t pid_arr[MAX_LENGTH];
-    
+   
     while(getline(&line, &len, open_file) != -1){
         command_line token_buffer = str_filler(line, " ");
         if (num_children_launched >= MAX_LENGTH) {
@@ -45,26 +45,26 @@ int main(int argc, char * argv[]){
             int received_signal;
 
             if(sigemptyset(&set) != 0){
-                perror("CHILD (PID: %d): sigemptyset() failed", getpid());
+                perror("CHILD (PID: %d): sigemptyset() failed");
                 free_command_line(&token_buffer); 
                 _exit(1);
             }
 
             if(sigaddset(&set, SIGUSR1) != 0){
                 if(errno == EINVAL){
-                    perror("CHILD (PID: %d): sigaddset(SIGUSR1) failed", getpid());
+                    perror("CHILD: sigaddset(SIGUSR1) failed");
                     free_command_line(&token_buffer); // Free before exit
                     _exit(1);
                 }
             }
 
             if(sigprocmask(SIG_BLOCK, &set, NULL) == -1){
-                perror("CHILD (PID: %d): sigprocmask failed to block SIGUSR1", getpid());
+                perror("CHILD: sigprocmask failed to block SIGUSR1");
                 free_command_line(&token_buffer); 
                 _exit(1);
             }
 
-            int sigwait_ret= sigwait(&set, &received_signal)
+            int sigwait_ret= sigwait(&set, &received_signal);
             if(sigwait_ret != 0){
                 fprintf(stderr, "CHILD (PID: %d): sigwait() failed with error %d.\n", getpid(), sigwait_ret);
                 free_command_line(&token_buffer);
