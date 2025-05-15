@@ -102,7 +102,7 @@ int main(int argc, char * argv[]){
     if(num_children_launched > 0){
         printf("PARENT (PID: %d): Sending SIGUSR1 signal", getpid());
         for(int i = 0; i < num_children_launched; i++){
-            if(kill(pid_arr[i], SIGUSR1) == 0){
+            if(kill(pid_arr[i], SIGUSR1) == -1){
                 perror("PARENT: kill (SIGUSR1) failed");
             }
         }
