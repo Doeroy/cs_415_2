@@ -40,35 +40,49 @@ int main(int argc, char * argv[]){
 
         pid_arr[num_children_launched] = fork();
         if(pid_arr[num_children_launched] == 0){
-            printf("Child process created\n");
+            printf("CHILD (PID: %d): process created\n", getpid());
             sigset_t set;
             int received_signal;
+
             if(sigemptyset(&set) != 0){
-                perror("CHILD: sigemptyset() failed");
+                perror("CHILD (PID: %d): sigemptyset() failed", getpid());
+                free_command_line(&token_buffer); 
+                _exit(1);
             }
 
             if(sigaddset(&set, SIGUSR1) != 0){
                 if(errno == EINVAL){
-                    perror("CHILD: Signo argument is an invalid or unsupported signal number");
+                    perror("CHILD (PID: %d): sigaddset(SIGUSR1) failed", getpid());
+                    free_command_line(&token_buffer); // Free before exit
                     _exit(1);
                 }
             }
 
             if(sigprocmask(SIG_BLOCK, &set, NULL) == -1){
-                perror("CHILD: sigprocmask failed to block SIGUSR1");
+                perror("CHILD (PID: %d): sigprocmask failed to block SIGUSR1", getpid());
+                free_command_line(&token_buffer); 
                 _exit(1);
             }
 
-            if(sigwait(&set, &received_signal) != 0){
-                perror("CHILD: sigwait() failed");
+            int sigwait_ret= sigwait(&set, &received_signal)
+            if(sigwait_ret != 0){
+                fprintf(stderr, "CHILD (PID: %d): sigwait() failed with error %d.\n", getpid(), sigwait_ret);
+                free_command_line(&token_buffer);
                 _exit(1);
-            } else{
-                printf("CHILD (PID: %d):: waiting", num_children_launched);
+            }
+
+            if (received_signal == SIGUSR1) {
+                printf("CHILD (PID: %d): Received SIGUSR1. Resuming and attempting to execvp().\n", getpid());
+                fflush(stdout);
+            } else {
+                fprintf(stderr, "CHILD (PID: %d): Received unexpected signal %d via sigwait instead of SIGUSR1.\n", getpid(), received_signal);
+                free_command_line(&token_buffer); // Free before exit
+                _exit(1);
             }
 
             if(execvp(token_buffer.command_list[0], token_buffer.command_list) == -1){
-                free_command_line(&token_buffer);
 		        perror("Error with execvp()");
+                free_command_line(&token_buffer);
                 _exit(1);
 	        }
 
@@ -92,6 +106,7 @@ int main(int argc, char * argv[]){
             kill(pid_arr[i], SIGCONT);
             printf("CHILD (PID: %d): SIGCONT signal sent, now waking up", num_children_launched);
     }
+
     for(int i = 0; i < num_children_launched; i++){
     	int wstatus;
     	pid_t terminated_pid;
