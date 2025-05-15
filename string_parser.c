@@ -5,13 +5,13 @@
  *      Author: gguan, Monil
  *
  */
-
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
- #include "string_parser.h"
- #include <ctype.h>
 #define _GNU_SOURCE
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "string_parser.h"
+#include <ctype.h>
+
  
  int count_token (char* buf, const char* delim)
  {

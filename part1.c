@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,7 +9,7 @@
 #include <errno.h>
 #include <sys/wait.h>
 #define MAX_LENGTH 1000
-#define _GNU_SOURCE
+
 
 
 int main(int argc, char * argv[]){
