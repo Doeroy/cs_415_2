@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <sys/wait.h>
+#include <signal.h>
 #define MAX_LENGTH 1000
 
 int main(int argc, char * argv[]){
@@ -44,26 +45,6 @@ int main(int argc, char * argv[]){
 		        perror("Error with execvp()");
                 _exit(1);
 	        }
-            sigset_t *set;
-            sigemptyset(&set);
-            int received_signal;
-            if(sigaddset(set, SIGUSR1) != 0){
-                if(errno == EINVAL){
-                    perror("CHILD: Signo argument is an invalid or unsupported signal number");
-                    _exit(1);
-                }
-            }
-            if(sigprocmask(SIG_BLOCK, &set, NULL) == -1){
-                perror("CHILD: sigprocmask failed to block SIGUSR1");
-                _exit(1);
-            }
-
-            if(sigwait(&set, received_signal) != 0){
-                perror("CHILD: sigwait() failed");
-                _exit(1);
-            } else{
-                printf("CHILD (PID: %d):: Resuming and now entering exec", num_children_launched);
-            }
         }
         else if(pid_arr[num_children_launched] > 0){
             printf("I'm the parent. Child ID is: %d\n", pid_arr[num_children_launched]);
@@ -79,7 +60,6 @@ int main(int argc, char * argv[]){
     for(int i = 0; i < num_children_launched; i++){
     	int wstatus;
     	pid_t terminated_pid;
-        sigwait(const sigset_t *set, int *sig)
 	    terminated_pid = waitpid(pid_arr[i], &wstatus, 0);
 	    if(terminated_pid == -1){
 	        perror("waitpid failed");
