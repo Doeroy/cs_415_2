@@ -11,7 +11,7 @@
  #include <string.h>
  #include "string_parser.h"
  #include <ctype.h>
- #define _GUN_SOURCE
+#define _GNU_SOURCE
  
  int count_token (char* buf, const char* delim)
  {
