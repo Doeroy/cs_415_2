@@ -87,8 +87,6 @@ void select_and_run_next_process() {
 
     if (next_idx_to_run != -1) {
         current_running_idx = next_idx_to_run;
-        fflush(stdout);
-
         if (process_states[current_running_idx] == PROC_INITIALIZING) {
             if (kill(pid_arr[current_running_idx], SIGUSR1) == -1) {
                 perror("PARENT: kill (SIGUSR1) for scheduled child failed");
@@ -150,15 +148,11 @@ void handle_terminated_children() {
             } else {
                 printf("Terminated with unknown status.\n");
             }
-            fflush(stdout);
-
             process_states[found_idx] = PROC_TERMINATED;
             active_children_count--;
             printf("PARENT: Active children count updated to %d.\n", active_children_count);
-
             if (current_running_idx == found_idx) {
                 printf("PARENT: Currently running child (PID: %d) terminated. Cancelling its alarm.\n", child_pid);
-                fflush(stdout);
                 alarm(0);
                 current_running_idx = -1; 
                 sigalrm_fired = 1; 
@@ -199,7 +193,6 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     printf("PARENT (PID: %d): Forking child processes...\n", getpid());
-    fflush(stdout);
     while ((getline(&line, &len, open_file)) != -1) {
         command_line token_buffer = str_filler(line, " ");
         if (token_buffer.num_token == 0) {
@@ -268,7 +261,6 @@ int main(int argc, char *argv[]) {
             }
             if (current_running_idx != -1 && process_states[current_running_idx] == PROC_RUNNING) {
                 printf("PARENT: Scheduler: Time slice ended for child (PID: %d). Sending SIGSTOP.\n", pid_arr[current_running_idx]);
-                fflush(stdout);
                 if (kill(pid_arr[current_running_idx], SIGSTOP) == 0) {
                     process_states[current_running_idx] = PROC_STOPPED;
                 } else {

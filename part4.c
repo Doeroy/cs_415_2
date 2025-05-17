@@ -131,7 +131,6 @@ void display_process_stats() {
            current_running_idx,
            (current_running_idx != -1 && process_states[current_running_idx] == PROC_RUNNING) ? "RUN" : ((current_running_idx != -1 && process_states[current_running_idx] == PROC_STOPPED) ? "STOP" : "N/A")
            );
-    fflush(stdout);
 }
 
 void select_and_run_next_process() {
