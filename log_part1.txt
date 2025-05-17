@@ -1,0 +1,77 @@
+==3099866== Memcheck, a memory error detector
+==3099866== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==3099866== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==3099866== Command: ./part1 input.txt
+==3099866== 
+total 231
+ 7 string_parser.o
+ 7 string_parser.h
+ 7 string_parser.c
+12 pseudo-shell
+ 7 part4.c
+24 part4
+ 7 part3.c
+12 part3
+ 7 part2.c
+12 part2
+ 7 part1.c
+12 part1
+ 7 log_part3.txt
+ 7 log_part2.txt
+ 1 log_part1.txt
+ 7 iobound.c
+12 iobound
+ 1 input.txt
+ 7 cpubound.c
+12 cpubound
+ 7 Makefile
+ 1 .vscode
+ 7 .part1.c.swp
+ 7 .part1.c.swo
+ 7 .part1.c.swn
+12 .git
+12 ..
+12 .
+Error with execvp(): No such file or directory
+I'm the parent. Child ID is: 3099867
+I'm the parent. Child ID is: 3099868
+Child process created
+==3099869== 
+==3099869== HEAP SUMMARY:
+==3099869==     in use at exit: 592 bytes in 2 blocks
+==3099869==   total heap usage: 21 allocs, 19 frees, 17,172 bytes allocated
+==3099869== 
+==3099869== LEAK SUMMARY:
+==3099869==    definitely lost: 0 bytes in 0 blocks
+==3099869==    indirectly lost: 0 bytes in 0 blocks
+==3099869==      possibly lost: 0 bytes in 0 blocks
+==3099869==    still reachable: 592 bytes in 2 blocks
+==3099869==         suppressed: 0 bytes in 0 blocks
+==3099869== Reachable blocks (those to which a pointer was found) are not shown.
+==3099869== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==3099869== 
+==3099869== For lists of detected and suppressed errors, rerun with: -s
+==3099869== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+Process: 3099870 - Begining to write to file.
+Process: 3099870 - Finished.
+Process: 3099871 - Begining calculation.
+Process: 3099871 - Finished.
+I'm the parent. Child ID is: 3099867
+I'm the parent. Child ID is: 3099868
+I'm the parent. Child ID is: 3099869
+I'm the parent. Child ID is: 3099870
+I'm the parent. Child ID is: 3099871
+PARENT: Child process 0 (PID: 3099867) terminated
+PARENT: Child process 1 (PID: 3099868) terminated
+PARENT: Child process 2 (PID: 3099869) terminated
+PARENT: Child process 3 (PID: 3099870) terminated
+PARENT: Child process 4 (PID: 3099871) terminated
+==3099866== 
+==3099866== HEAP SUMMARY:
+==3099866==     in use at exit: 0 bytes in 0 blocks
+==3099866==   total heap usage: 33 allocs, 33 frees, 17,374 bytes allocated
+==3099866== 
+==3099866== All heap blocks were freed -- no leaks are possible
+==3099866== 
+==3099866== For lists of detected and suppressed errors, rerun with: -s
+==3099866== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

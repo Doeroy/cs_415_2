@@ -1,0 +1,387 @@
+==3100685== Memcheck, a memory error detector
+==3100685== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==3100685== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==3100685== Command: ./part4 input.txt
+==3100685== 
+total 238
+ 7 string_parser.o
+ 7 string_parser.h
+ 7 string_parser.c
+12 pseudo-shell
+ 7 part4.c
+24 part4
+ 7 part3.c
+12 part3
+ 7 part2.c
+12 part2
+ 7 part1.c
+12 part1
+ 1 log_part4.txt
+ 7 log_part3.txt
+ 7 log_part2.txt
+ 7 log_part1.txt
+ 7 iobound.c
+12 iobound
+ 1 input.txt
+ 7 cpubound.c
+12 cpubound
+ 7 Makefile
+ 1 .vscode
+ 7 .part1.c.swp
+ 7 .part1.c.swo
+ 7 .part1.c.swn
+12 .git
+12 ..
+12 .
+CHILD: execvp failed: No such file or directory
+CHILD: Failed command: 'invalid'
+==3100696== 
+==3100696== HEAP SUMMARY:
+==3100696==     in use at exit: 601 bytes in 4 blocks
+==3100696==   total heap usage: 22 allocs, 18 frees, 8,986 bytes allocated
+==3100696== 
+==3100696== LEAK SUMMARY:
+==3100696==    definitely lost: 0 bytes in 0 blocks
+==3100696==    indirectly lost: 0 bytes in 0 blocks
+==3100696==      possibly lost: 0 bytes in 0 blocks
+==3100696==    still reachable: 601 bytes in 4 blocks
+==3100696==         suppressed: 0 bytes in 0 blocks
+==3100696== Reachable blocks (those to which a pointer was found) are not shown.
+==3100696== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==3100696== 
+==3100696== For lists of detected and suppressed errors, rerun with: -s
+==3100696== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | S     | 0.00     | 0.00     | 94449664     | 46514176    
+3100695 | sleep                | S     | 0.00     | 0.00     | 94515200     | 46764032    
+3100696 | invalid              | S     | 0.00     | 0.00     | 94515200     | 46764032    
+3100697 | ./iobound            | S     | 0.00     | 0.00     | 94515200     | 46764032    
+3100698 | ./cpubound           | S     | 0.00     | 0.00     | 94515200     | 46727168    
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 5 | Running PID: 0 (Idx: -1, State: N/A)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | R     | 0.00     | 0.00     | 94449664     | 46514176    
+3100695 | sleep                | S     | 0.00     | 0.00     | 94515200     | 46764032    
+3100696 | invalid              | S     | 0.00     | 0.00     | 94515200     | 46764032    
+3100697 | ./iobound            | S     | 0.00     | 0.00     | 94515200     | 46764032    
+3100698 | ./cpubound           | S     | 0.00     | 0.00     | 94515200     | 46727168    
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 5 | Running PID: 3100694 (Idx: 0, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | S     | 0.00     | 0.00     | 94515200     | 46764032    
+3100696 | invalid              | S     | 0.00     | 0.00     | 94515200     | 46764032    
+3100697 | ./iobound            | S     | 0.00     | 0.00     | 94515200     | 46764032    
+3100698 | ./cpubound           | S     | 0.00     | 0.00     | 94515200     | 46727168    
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 4 | Running PID: 0 (Idx: -1, State: N/A)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | R     | 0.00     | 0.00     | 94515200     | 46764032    
+3100696 | invalid              | S     | 0.00     | 0.00     | 94515200     | 46764032    
+3100697 | ./iobound            | S     | 0.00     | 0.00     | 94515200     | 46764032    
+3100698 | ./cpubound           | S     | 0.00     | 0.00     | 94515200     | 46727168    
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 4 | Running PID: 3100695 (Idx: 1, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | T     | 0.00     | 0.01     | 2859008      | 995328      
+3100696 | invalid              | R     | 0.00     | 0.00     | 94515200     | 46764032    
+3100697 | ./iobound            | S     | 0.00     | 0.00     | 94515200     | 46764032    
+3100698 | ./cpubound           | S     | 0.00     | 0.00     | 94515200     | 46727168    
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 4 | Running PID: 3100696 (Idx: 2, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | T     | 0.00     | 0.01     | 2859008      | 995328      
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | S     | 0.00     | 0.00     | 94515200     | 46764032    
+3100698 | ./cpubound           | S     | 0.00     | 0.00     | 94515200     | 46727168    
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 3 | Running PID: 0 (Idx: -1, State: N/A)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | R     | 0.00     | 0.01     | 0            | 0           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | S     | 0.00     | 0.00     | 94515200     | 46764032    
+3100698 | ./cpubound           | S     | 0.00     | 0.00     | 94515200     | 46727168    
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 3 | Running PID: 3100695 (Idx: 1, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | S     | 0.00     | 0.00     | 94515200     | 46764032    
+3100698 | ./cpubound           | S     | 0.00     | 0.00     | 94515200     | 46727168    
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 2 | Running PID: 0 (Idx: -1, State: N/A)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | R     | 0.00     | 0.00     | 94515200     | 46764032    
+3100698 | ./cpubound           | S     | 0.00     | 0.00     | 94515200     | 46727168    
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 2 | Running PID: 3100697 (Idx: 3, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | T     | 0.70     | 0.30     | 2842624      | 995328      
+3100698 | ./cpubound           | R     | 0.00     | 0.00     | 4096         | 4096        
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 2 | Running PID: 3100698 (Idx: 4, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | R     | 0.70     | 0.30     | 2842624      | 995328      
+3100698 | ./cpubound           | T     | 0.41     | 0.58     | 2842624      | 995328      
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 2 | Running PID: 3100697 (Idx: 3, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | T     | 1.42     | 0.57     | 2842624      | 995328      
+3100698 | ./cpubound           | R     | 0.41     | 0.58     | 2842624      | 995328      
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 2 | Running PID: 3100698 (Idx: 4, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | R     | 1.42     | 0.57     | 2842624      | 995328      
+3100698 | ./cpubound           | T     | 0.86     | 1.12     | 2842624      | 995328      
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 2 | Running PID: 3100697 (Idx: 3, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | T     | 2.17     | 0.83     | 2842624      | 995328      
+3100698 | ./cpubound           | R     | 0.86     | 1.13     | 2842624      | 995328      
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 2 | Running PID: 3100698 (Idx: 4, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | R     | 2.17     | 0.83     | 2842624      | 995328      
+3100698 | ./cpubound           | T     | 1.27     | 1.72     | 2842624      | 995328      
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 2 | Running PID: 3100697 (Idx: 3, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | T     | 2.90     | 1.09     | 2842624      | 995328      
+3100698 | ./cpubound           | R     | 1.27     | 1.72     | 2842624      | 995328      
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 2 | Running PID: 3100698 (Idx: 4, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | R     | 2.90     | 1.09     | 2842624      | 995328      
+3100698 | ./cpubound           | T     | 1.77     | 2.22     | 2842624      | 995328      
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 2 | Running PID: 3100697 (Idx: 3, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | T     | 3.66     | 1.34     | 2842624      | 995328      
+3100698 | ./cpubound           | R     | 1.77     | 2.22     | 2842624      | 995328      
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 2 | Running PID: 3100698 (Idx: 4, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | R     | 3.66     | 1.34     | 2842624      | 995328      
+3100698 | ./cpubound           | T     | 2.23     | 2.76     | 2842624      | 995328      
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 2 | Running PID: 3100697 (Idx: 3, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | T     | 4.39     | 1.61     | 2842624      | 995328      
+3100698 | ./cpubound           | R     | 2.23     | 2.76     | 2842624      | 995328      
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 2 | Running PID: 3100698 (Idx: 4, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | R     | 4.39     | 1.61     | 2842624      | 995328      
+3100698 | ./cpubound           | T     | 2.66     | 3.33     | 2842624      | 995328      
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 2 | Running PID: 3100697 (Idx: 3, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | T     | 5.16     | 1.83     | 2842624      | 995328      
+3100698 | ./cpubound           | R     | 2.66     | 3.33     | 2842624      | 995328      
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 2 | Running PID: 3100698 (Idx: 4, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | R     | 5.16     | 1.83     | 2842624      | 995328      
+3100698 | ./cpubound           | T     | 3.10     | 3.88     | 2842624      | 995328      
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 2 | Running PID: 3100697 (Idx: 3, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | T     | 5.85     | 2.15     | 2842624      | 995328      
+3100698 | ./cpubound           | R     | 3.10     | 3.88     | 2842624      | 995328      
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 2 | Running PID: 3100698 (Idx: 4, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | R     | 5.85     | 2.15     | 2842624      | 995328      
+3100698 | ./cpubound           | T     | 3.49     | 4.50     | 2842624      | 995328      
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 2 | Running PID: 3100697 (Idx: 3, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | T     | 6.57     | 2.43     | 2842624      | 995328      
+3100698 | ./cpubound           | R     | 3.49     | 4.50     | 2842624      | 995328      
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 2 | Running PID: 3100698 (Idx: 4, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | R     | 6.57     | 2.43     | 2842624      | 995328      
+3100698 | ./cpubound           | T     | 3.92     | 5.07     | 2842624      | 995328      
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 2 | Running PID: 3100697 (Idx: 3, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | T     | 7.31     | 2.69     | 2842624      | 995328      
+3100698 | ./cpubound           | R     | 3.92     | 5.07     | 2842624      | 995328      
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 2 | Running PID: 3100698 (Idx: 4, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | R     | 7.31     | 2.69     | 2842624      | 995328      
+3100698 | ./cpubound           | T     | 4.28     | 5.70     | 2842624      | 995328      
+---------------------Process: 3100697 - Begining to write to file.
+Process: 3100697 - Finished.
+Process: 3100698 - Begining calculation.
+Process: 3100698 - Finished.
+---------------------------------------------------------------------
+Total Procs: 5 | Active: 2 | Running PID: 3100697 (Idx: 3, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | TERM  | -        | -        | -            | -           
+3100698 | ./cpubound           | T     | 4.28     | 5.70     | 2842624      | 995328      
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 1 | Running PID: 0 (Idx: -1, State: N/A)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | TERM  | -        | -        | -            | -           
+3100698 | ./cpubound           | R     | 4.28     | 5.70     | 2842624      | 995328      
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 1 | Running PID: 3100698 (Idx: 4, State: RUN)
+[H[J--- MCP Process Dashboard (Parent PID: 3100685) ---
+PID   | Command              | State | UTime(s) | STime(s) | VmSize(B)    | RSS(B)      
+-----|----------------------|-------|----------|----------|--------------|--------------
+3100694 | ls                   | TERM  | -        | -        | -            | -           
+3100695 | sleep                | TERM  | -        | -        | -            | -           
+3100696 | invalid              | TERM  | -        | -        | -            | -           
+3100697 | ./iobound            | TERM  | -        | -        | -            | -           
+3100698 | ./cpubound           | TERM  | -        | -        | -            | -           
+------------------------------------------------------------------------------------------
+Total Procs: 5 | Active: 0 | Running PID: 0 (Idx: -1, State: N/A)
+[H[JPARENT (PID: 3100685): All child processes have completed. MCP exiting.
+==3100685== 
+==3100685== HEAP SUMMARY:
+==3100685==     in use at exit: 0 bytes in 0 blocks
+==3100685==   total heap usage: 186 allocs, 186 frees, 128,112 bytes allocated
+==3100685== 
+==3100685== All heap blocks were freed -- no leaks are possible
+==3100685== 
+==3100685== For lists of detected and suppressed errors, rerun with: -s
+==3100685== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

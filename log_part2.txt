@@ -1,0 +1,95 @@
+==3095627== Memcheck, a memory error detector
+==3095627== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==3095627== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==3095627== Command: ./part2 input.txt
+==3095627== 
+CHILD (PID: 3095637): process created
+CHILD (PID: 3095637): Received SIGUSR1. Resuming and attempting to execvp().
+I'm the parent. Child ID is: 3095637
+CHILD (PID: 3095638): process created
+CHILD (PID: 3095638): Received SIGUSR1. Resuming and attempting to execvp().
+I'm the parent. Child ID is: 3095637
+I'm the parent. Child ID is: 3095638
+CHILD (PID: 3095639): process created
+CHILD (PID: 3095639): Received SIGUSR1. Resuming and attempting to execvp().
+I'm the parent. Child ID is: 3095637
+I'm the parent. Child ID is: 3095638
+I'm the parent. Child ID is: 3095639
+CHILD (PID: 3095640): process created
+CHILD (PID: 3095640): Received SIGUSR1. Resuming and attempting to execvp().
+I'm the parent. Child ID is: 3095637
+I'm the parent. Child ID is: 3095638
+I'm the parent. Child ID is: 3095639
+I'm the parent. Child ID is: 3095640
+CHILD (PID: 3095641): process created
+CHILD (PID: 3095641): Received SIGUSR1. Resuming and attempting to execvp().
+total 225
+ 7 string_parser.o
+ 7 string_parser.h
+ 7 string_parser.c
+12 pseudo-shell
+ 7 part4.c
+24 part4
+ 7 part3.c
+12 part3
+ 7 part2.c
+12 part2
+ 7 part1.c
+12 part1
+ 7 log_part3.txt
+ 1 log_part2.txt
+ 7 iobound.c
+12 iobound
+ 1 input.txt
+ 7 cpubound.c
+12 cpubound
+ 7 Makefile
+ 1 .vscode
+ 7 .part1.c.swp
+ 7 .part1.c.swo
+ 7 .part1.c.swn
+12 .git
+12 ..
+12 .
+Error with execvp(): No such file or directory
+==3095639== 
+==3095639== HEAP SUMMARY:
+==3095639==     in use at exit: 592 bytes in 2 blocks
+==3095639==   total heap usage: 21 allocs, 19 frees, 17,172 bytes allocated
+==3095639== 
+==3095639== LEAK SUMMARY:
+==3095639==    definitely lost: 0 bytes in 0 blocks
+==3095639==    indirectly lost: 0 bytes in 0 blocks
+==3095639==      possibly lost: 0 bytes in 0 blocks
+==3095639==    still reachable: 592 bytes in 2 blocks
+==3095639==         suppressed: 0 bytes in 0 blocks
+==3095639== Reachable blocks (those to which a pointer was found) are not shown.
+==3095639== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==3095639== 
+==3095639== For lists of detected and suppressed errors, rerun with: -s
+==3095639== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+Process: 3095641 - Begining calculation.
+Process: 3095641 - Finished.
+Process: 3095640 - Begining to write to file.
+Process: 3095640 - Finished.
+I'm the parent. Child ID is: 3095637
+I'm the parent. Child ID is: 3095638
+I'm the parent. Child ID is: 3095639
+I'm the parent. Child ID is: 3095640
+I'm the parent. Child ID is: 3095641
+PARENT (PID: 3095627): Sending SIGUSR1 signalPARENT (PID: 3095627): Sending SIGSTOP signal
+PARENT (PID: 3095627): Sending SIGCONT signal
+PARENT: Child process 0 (PID: 3095637) terminated 
+PARENT: Child process 1 (PID: 3095638) terminated 
+PARENT: Child process 2 (PID: 3095639) terminated 
+PARENT: Child process 3 (PID: 3095640) terminated 
+PARENT: Child process 4 (PID: 3095641) terminated 
+==3095627== 
+==3095627== HEAP SUMMARY:
+==3095627==     in use at exit: 0 bytes in 0 blocks
+==3095627==   total heap usage: 33 allocs, 33 frees, 17,374 bytes allocated
+==3095627== 
+==3095627== All heap blocks were freed -- no leaks are possible
+==3095627== 
+==3095627== For lists of detected and suppressed errors, rerun with: -s
+==3095627== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
