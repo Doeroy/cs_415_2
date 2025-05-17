@@ -87,8 +87,6 @@ void select_and_run_next_process() {
 
     if (next_idx_to_run != -1) {
         current_running_idx = next_idx_to_run;
-        printf("PARENT: Scheduler: Next to run is child (PID: %d, Index: %d, State: %d).\n",
-               pid_arr[current_running_idx], current_running_idx, process_states[current_running_idx]);
         fflush(stdout);
 
         if (process_states[current_running_idx] == PROC_INITIALIZING) {
@@ -116,12 +114,10 @@ void select_and_run_next_process() {
         }        
         if (process_states[current_running_idx] == PROC_RUNNING) {
             printf("PARENT: Scheduler: Setting alarm for child (PID: %d).\n", pid_arr[current_running_idx]);
-            fflush(stdout);
             alarm(TIME_SLICE_SECONDS);
         }
     } else if (active_children_count > 0) {
         printf("PARENT: Scheduler: No new process to switch to, but active children remain. Current running: %d\n", current_running_idx);
-        fflush(stdout);
         if(current_running_idx != -1 && process_states[current_running_idx] == PROC_RUNNING) {
             alarm(TIME_SLICE_SECONDS); 
             alarm(1);
@@ -159,7 +155,6 @@ void handle_terminated_children() {
             process_states[found_idx] = PROC_TERMINATED;
             active_children_count--;
             printf("PARENT: Active children count updated to %d.\n", active_children_count);
-            fflush(stdout);
 
             if (current_running_idx == found_idx) {
                 printf("PARENT: Currently running child (PID: %d) terminated. Cancelling its alarm.\n", child_pid);
