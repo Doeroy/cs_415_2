@@ -1,174 +1,177 @@
-#define _GNU_SOURCE
+#define _GNU_SOURCE // Must be the first line for getline, strdup (if used in str_filler)
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <signal.h>
 #include <sys/types.h>
-#include <time.h>
+#include <sys/wait.h> // For waitpid and status macros
+#include <signal.h>   // For sigset_t, sigemptyset, sigaddset, sigprocmask, sigwait, kill, signals, sigaction
+#include <time.h>     // For nanosleep (optional, for precise sleeps) or time()
 #include "string_parser.h"
-#include <unistd.h>
-#include <errno.h>
-#include <sys/wait.h>
+#include <unistd.h> // For fork, execvp, _exit, getpid, sleep, alarm, pause
+#include <errno.h>  // For errno
 
-#define MAX_LENGTH 1000
-#define TIME_SLICE_SECONDS 1
+#define MAX_COMMANDS 1000
+#define TIME_SLICE_SECONDS 1 // Define the time slice for each process
 
+// Enum for process states (relevant for the scheduler)
 typedef enum {
-    PROC_INITIALIZING,
+    PROC_INITIALIZING, // Child has been forked, waiting for initial SIGUSR1 from scheduler
     PROC_RUNNING,
     PROC_STOPPED,
     PROC_TERMINATED
 } process_state_t;
 
-pid_t pid_arr[MAX_LENGTH];
-process_state_t status_arr[MAX_LENGTH];
+// Global variables for signal handling and scheduling
+volatile sig_atomic_t sigalrm_fired = 0; // Flag set by SIGALRM handler
+volatile sig_atomic_t sigchld_fired = 0; // Flag set by SIGCHLD handler
+
+pid_t pid_arr[MAX_COMMANDS];
+process_state_t process_states[MAX_COMMANDS];
 int num_children_launched = 0;
-int curr_index = -1; // Initialize to -1, will be set before first use
-int active_children_count = 0;
+int current_running_idx = -1; 
+int active_children_count = 0; 
 
-volatile sig_atomic_t g_sigalrm_fired = 0;
-volatile sig_atomic_t g_sigchld_fired = 0;
-
-void actual_sigalrm_handler(int sig) {
-    g_sigalrm_fired = 1;
+void sigalrm_handler(int signum) {
+    if (signum == SIGALRM) {
+        sigalrm_fired = 1;
+    }
 }
 
-void actual_sigchld_handler(int sig) {
-    g_sigchld_fired = 1;
+// SIGCHLD handler function
+void sigchld_handler(int signum) {
+    if (signum == SIGCHLD) {
+        sigchld_fired = 1;
+    }
 }
 
-int find_next_schedulable_process_idx(int last_processed_idx) {
+void select_and_run_next_process() {
     if (active_children_count == 0) {
-        return -1;
-    }
-    int search_start_idx = (last_processed_idx == -1) ? 0 : (last_processed_idx + 1);
-    for (int i = 0; i < num_children_launched; i++) {
-        int candidate_idx = (search_start_idx + i) % num_children_launched;
-        if (status_arr[candidate_idx] == PROC_INITIALIZING || status_arr[candidate_idx] == PROC_STOPPED) {
-            return candidate_idx;
-        }
-    }
-    if (active_children_count == 1 && last_processed_idx != -1 && status_arr[last_processed_idx] == PROC_STOPPED) {
-        return last_processed_idx;
-    }
-    if (active_children_count > 0) {
-        search_start_idx = (last_processed_idx == -1) ? 0 : (last_processed_idx + 1);
-         for (int i = 0; i < num_children_launched; i++) {
-            int candidate_idx = (search_start_idx + i) % num_children_launched;
-            if (status_arr[candidate_idx] != PROC_TERMINATED) {
-                return candidate_idx;
-            }
-        }
+        current_running_idx = -1;
+        alarm(0); 
+        return;
     }
 
-    return -1;
-}
-
-void change_process() {
-    int previously_running_idx = curr_index;
-    if (previously_running_idx != -1 && status_arr[previously_running_idx] == PROC_RUNNING) {
-        printf("PARENT: Timeslice for PID %d (idx %d) ended. Stopping.\n", pid_arr[previously_running_idx], previously_running_idx);
-        if (kill(pid_arr[previously_running_idx], SIGSTOP) == 0) {
-            status_arr[previously_running_idx] = PROC_STOPPED;
-        } else {
-            if (errno == ESRCH) {
-                printf("PARENT: Process PID %d (idx %d) already exited before SIGSTOP.\n", pid_arr[previously_running_idx], previously_running_idx);
-                if (status_arr[previously_running_idx] != PROC_TERMINATED) {
-                    status_arr[previously_running_idx] = PROC_TERMINATED;
-                    active_children_count--;
-                }
-            } else {
-                perror("PARENT: kill (SIGSTOP) failed");
-            }
-        }
-    }
-    curr_index = find_next_schedulable_process_idx(previously_running_idx);
-    if (curr_index != -1) {
-        printf("PARENT: Switching to process PID %d (idx %d). Current state: %d\n", pid_arr[curr_index], curr_index, status_arr[curr_index]);
-        if (status_arr[curr_index] == PROC_INITIALIZING) {
-            printf("PARENT: Initializing and Starting PID %d (idx %d)\n", pid_arr[curr_index], curr_index);
-            if (kill(pid_arr[curr_index], SIGUSR1) == -1) {
-                perror("PARENT: kill (SIGUSR1) failed");
-                status_arr[curr_index] = PROC_TERMINATED; 
-                active_children_count--;
-            } else {
-                status_arr[curr_index] = PROC_RUNNING;
-            }
-        } else if (status_arr[curr_index] == PROC_STOPPED) {
-            printf("PARENT: Continuing PID %d (idx %d)\n", pid_arr[curr_index], curr_index);
-            if (kill(pid_arr[curr_index], SIGCONT) == -1) {
-                perror("PARENT: kill (SIGCONT) failed");
-                status_arr[curr_index] = PROC_TERMINATED;
-                active_children_count--;
-            } else {
-                status_arr[curr_index] = PROC_RUNNING;
-            }
-        } else if (status_arr[curr_index] == PROC_RUNNING) {
-            printf("PARENT: Re-scheduling only active process PID %d (idx %d) which is already running (or was just continued).\n", pid_arr[curr_index], curr_index);
-        }
-        if (active_children_count > 0 && status_arr[curr_index] == PROC_RUNNING) {
-            alarm(TIME_SLICE_SECONDS);
-        } else if (active_children_count == 0) {
-            alarm(0);
-        } else if (curr_index == -1 && active_children_count > 0){
-            printf("PARENT: change_process ended with curr_index -1 but active children %d. Setting alarm.\n", active_children_count);
-            alarm(TIME_SLICE_SECONDS);
-        }
-
+    int search_start_idx = 0;
+    if (current_running_idx != -1) { 
+        search_start_idx = (current_running_idx + 1) % num_children_launched;
     } else { 
-        if (active_children_count == 0) {
-            printf("PARENT: No schedulable process found and no active children. Stopping alarm.\n");
-            alarm(0);
-        } else {
-            printf("PARENT: No schedulable process found by change_process. Keeping alarm for now.\n");
-            alarm(TIME_SLICE_SECONDS); 
+        for(int i=0; i<num_children_launched; ++i) {
+            if(process_states[i] != PROC_TERMINATED) {
+                search_start_idx = i;
+                break;
+            }
+        }
     }
-}
+    
+    int next_idx_to_run = -1;
+    for (int i = 0; i < num_children_launched; ++i) {
+        int temp_idx = (search_start_idx + i) % num_children_launched;
+        if (process_states[temp_idx] == PROC_INITIALIZING || process_states[temp_idx] == PROC_STOPPED) {
+            next_idx_to_run = temp_idx;
+            break;
+        }
+    }
+
+    if (next_idx_to_run == -1) {
+        if (current_running_idx != -1 && process_states[current_running_idx] == PROC_RUNNING) {
+            next_idx_to_run = current_running_idx;
+        } else {
+             for (int i = 0; i < num_children_launched; ++i) {
+                if (process_states[i] == PROC_RUNNING) {
+                    next_idx_to_run = i;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (next_idx_to_run != -1) {
+        current_running_idx = next_idx_to_run;
+        printf("PARENT: Scheduler: Next to run is child (PID: %d, Index: %d, State: %d).\n",
+               pid_arr[current_running_idx], current_running_idx, process_states[current_running_idx]);
+        fflush(stdout);
+
+        if (process_states[current_running_idx] == PROC_INITIALIZING) {
+            if (kill(pid_arr[current_running_idx], SIGUSR1) == -1) {
+                perror("PARENT: kill (SIGUSR1) for scheduled child failed");
+                process_states[current_running_idx] = PROC_TERMINATED; 
+                active_children_count--;
+                current_running_idx = -1; 
+                sigalrm_fired = 1; 
+                return;
+            }
+            process_states[current_running_idx] = PROC_RUNNING;
+        } else if (process_states[current_running_idx] == PROC_STOPPED) {
+            if (kill(pid_arr[current_running_idx], SIGCONT) == -1) {
+                perror("PARENT: kill (SIGCONT) for scheduled child failed");
+                if (errno == ESRCH) { 
+                    process_states[current_running_idx] = PROC_TERMINATED;
+                    active_children_count--;
+                    current_running_idx = -1;
+                    sigalrm_fired = 1; 
+                    return;
+                }
+            }
+            process_states[current_running_idx] = PROC_RUNNING;
+        }        
+        if (process_states[current_running_idx] == PROC_RUNNING) {
+            printf("PARENT: Scheduler: Setting alarm for child (PID: %d).\n", pid_arr[current_running_idx]);
+            fflush(stdout);
+            alarm(TIME_SLICE_SECONDS);
+        }
+    } else if (active_children_count > 0) {
+        printf("PARENT: Scheduler: No new process to switch to, but active children remain. Current running: %d\n", current_running_idx);
+        fflush(stdout);
+        if(current_running_idx != -1 && process_states[current_running_idx] == PROC_RUNNING) {
+            alarm(TIME_SLICE_SECONDS); 
+            alarm(1);
+        }
+    } else {
+        alarm(0); 
+        current_running_idx = -1;
+    }
 }
 
 void handle_terminated_children() {
     int status;
-    pid_t terminated_pid;
-    int child_was_reaped_this_invocation = 0;
+    pid_t child_pid;
 
-    while ((terminated_pid = waitpid(-1, &status, WNOHANG)) > 0) {
-        child_was_reaped_this_invocation = 1;
-        int reaped_child_idx = -1;
-
-        for (int i = 0; i < num_children_launched; i++) {
-            if (pid_arr[i] == terminated_pid) {
-                reaped_child_idx = i;
-                if (status_arr[i] != PROC_TERMINATED) {
-                    status_arr[i] = PROC_TERMINATED;
-                    active_children_count--;
-                    printf("PARENT: Child PID %d (idx %d) reaped. Active children: %d. ",
-                           terminated_pid, i, active_children_count);
-                    if (WIFEXITED(status)) {
-                        printf("Exited normally (status %d).\n", WEXITSTATUS(status));
-                    } else if (WIFSIGNALED(status)) {
-                        printf("Terminated by signal %d.\n", WTERMSIG(status));
-                    } else {
-                        printf("Terminated abnormally.\n");
-                    }
-                }
+    while ((child_pid = waitpid(-1, &status, WNOHANG)) > 0) {
+        int found_idx = -1;
+        for (int i = 0; i < num_children_launched; ++i) {
+            if (pid_arr[i] == child_pid) {
+                found_idx = i;
                 break;
             }
         }
 
-        if (reaped_child_idx != -1) {
-            if (active_children_count == 0) {
-                printf("PARENT: All children have terminated (handled by SIGCHLD). Cancelling alarm.\n");
+        if (found_idx != -1 && process_states[found_idx] != PROC_TERMINATED) {
+            printf("PARENT: Child (PID: %d, Index: %d) has terminated. ", child_pid, found_idx);
+            if (WIFEXITED(status)) {
+                printf("Exited status %d.\n", WEXITSTATUS(status));
+            } else if (WIFSIGNALED(status)) {
+                printf("Killed by signal %d.\n", WTERMSIG(status));
+            } else {
+                printf("Terminated with unknown status.\n");
+            }
+            fflush(stdout);
+
+            process_states[found_idx] = PROC_TERMINATED;
+            active_children_count--;
+            printf("PARENT: Active children count updated to %d.\n", active_children_count);
+            fflush(stdout);
+
+            if (current_running_idx == found_idx) {
+                printf("PARENT: Currently running child (PID: %d) terminated. Cancelling its alarm.\n", child_pid);
+                fflush(stdout);
                 alarm(0);
-            } else if (reaped_child_idx == curr_index) {
-                printf("PARENT: Currently running process (PID %d, idx %d) terminated early.\n",
-                       pid_arr[curr_index], curr_index);
-                alarm(0);
-                g_sigalrm_fired = 1;
+                current_running_idx = -1; 
+                sigalrm_fired = 1; 
             }
         }
     }
-    if (terminated_pid == -1 && errno != ECHILD && errno != 0) {
-        perror("waitpid in handle_terminated_children");
+    if (child_pid == -1 && errno != ECHILD && errno != 0) { 
+        perror("PARENT: waitpid WNOHANG error in handle_terminated_children");
     }
 }
 int main(int argc, char *argv[]) {
@@ -185,14 +188,31 @@ int main(int argc, char *argv[]) {
         perror("Error opening input file");
         return 1;
     }
+    struct sigaction sa_alarm, sa_chld;
+    memset(&sa_alarm, 0, sizeof(sa_alarm));
+    sa_alarm.sa_handler = sigalrm_handler;
+    sa_alarm.sa_flags = SA_RESTART; 
+    if (sigaction(SIGALRM, &sa_alarm, NULL) == -1) {
+        perror("PARENT: sigaction for SIGALRM failed");
+        return 1;
+    }
+    memset(&sa_chld, 0, sizeof(sa_chld));
+    sa_chld.sa_handler = sigchld_handler;
+    sa_chld.sa_flags = SA_RESTART | SA_NOCLDSTOP; 
+    if (sigaction(SIGCHLD, &sa_chld, NULL) == -1) {
+        perror("PARENT: sigaction for SIGCHLD failed");
+        return 1;
+    }
+    printf("PARENT (PID: %d): Forking child processes...\n", getpid());
+    fflush(stdout);
     while ((getline(&line, &len, open_file)) != -1) {
-        command_line token_buffer = str_filler(line, " \t\n");
+        command_line token_buffer = str_filler(line, " ");
         if (token_buffer.num_token == 0) {
-            free_command_line(&token_buffer);
+            if (token_buffer.command_list != NULL) free_command_line(&token_buffer);
             continue;
         }
-        if (num_children_launched >= MAX_LENGTH) {
-            fprintf(stderr, "PARENT: Maximum number of commands (%d) reached. Skipping: %s\n", MAX_LENGTH, token_buffer.command_list[0]);
+        if (num_children_launched >= MAX_COMMANDS) {
+            fprintf(stderr, "PARENT: Max commands reached. Skipping: %s\n", line);
             free_command_line(&token_buffer);
             continue;
         }
@@ -200,102 +220,83 @@ int main(int argc, char *argv[]) {
         if (child_pid < 0) {
             perror("PARENT: Fork failed");
             free_command_line(&token_buffer);
-        } else if (child_pid == 0) {
-            sigset_t set_for_usr1;
-            int recvd_sig;
-            sigemptyset(&set_for_usr1);
-            sigaddset(&set_for_usr1, SIGUSR1);
-
-            if (sigprocmask(SIG_BLOCK, &set_for_usr1, NULL) == -1) {
-                perror("CHILD: sigprocmask block SIGUSR1 failed");
-                free_command_line(&token_buffer);
-                _exit(errno);
-            }
-
-            if (sigwait(&set_for_usr1, &recvd_sig) != 0) {
-                fprintf(stderr, "CHILD (PID %d): sigwait failed with error %d.\n", getpid(), errno);
-                free_command_line(&token_buffer);
-                _exit(errno);
-            }
-
-            if (recvd_sig == SIGUSR1) {
-                printf("CHILD (PID %d): Received SIGUSR1. Executing command: %s\n", getpid(), token_buffer.command_list[0]);
-            } else {
-                fprintf(stderr, "CHILD (PID %d): Received unexpected signal %d via sigwait.\n", getpid(), recvd_sig);
-                free_command_line(&token_buffer);
-                _exit(1);
-            }
-
-            if (execvp(token_buffer.command_list[0], token_buffer.command_list) == -1) {
-                perror("CHILD: execvp failed");
-                fprintf(stderr, "CHILD: Failed command was: %s\n", token_buffer.command_list[0]);
-                free_command_line(&token_buffer);
-                _exit(errno);
-            }
-        } else { 
+            } else if (child_pid == 0) { 
+                sigset_t set_for_usr1; int recvd_sig;
+                sigemptyset(&set_for_usr1); sigaddset(&set_for_usr1, SIGUSR1);
+                if (sigprocmask(SIG_BLOCK, &set_for_usr1, NULL) == -1) { 
+                    perror("CHILD: sigprocmask"); free_command_line(&token_buffer); _exit(1); 
+                }
+                if (sigwait(&set_for_usr1, &recvd_sig) != 0) { 
+                    fprintf(stderr, "CHILD: sigwait failed\n"); free_command_line(&token_buffer); _exit(1); 
+                }
+                if (recvd_sig == SIGUSR1) {
+                    sigprocmask(SIG_UNBLOCK, &set_for_usr1, NULL); 
+                } else { 
+                    fprintf(stderr, "CHILD: Bad signal %d\n", recvd_sig); 
+                    free_command_line(&token_buffer); _exit(1); 
+                }
+                if (execvp(token_buffer.command_list[0], token_buffer.command_list) == -1) {
+                    perror("CHILD: execvp failed");
+                    fprintf(stderr, "CHILD: Failed cmd: '%s'\n", token_buffer.command_list[0]);
+                    free_command_line(&token_buffer); _exit(1);
+                }
+            } 
+        else { 
             pid_arr[num_children_launched] = child_pid;
-            status_arr[num_children_launched] = PROC_INITIALIZING;
-            printf("PARENT: Launched child PID %d for command: %s\n", child_pid, token_buffer.command_list[0]);
+            process_states[num_children_launched] = PROC_INITIALIZING;
             num_children_launched++;
             free_command_line(&token_buffer);
         }
     }
     fclose(open_file);
-    if (line) {
-        free(line);
-        line = NULL;
-    }
+    free(line);
+
     active_children_count = num_children_launched;
     if (num_children_launched == 0) {
-        printf("PARENT: No commands found in input file. Exiting.\n");
+        printf("PARENT: No commands to run. Exiting.\n");
         return 0;
     }
-    signal(SIGALRM, actual_sigalrm_handler);
-    signal(SIGCHLD, actual_sigchld_handler);
-    curr_index = find_next_schedulable_process_idx(-1); 
-    if (curr_index != -1) {
-        printf("PARENT: Starting initial process PID %d (idx %d).\n", pid_arr[curr_index], curr_index);
-        if (kill(pid_arr[curr_index], SIGUSR1) == -1) {
-            perror("PARENT: kill (SIGUSR1) for initial process failed");
-            status_arr[curr_index] = PROC_TERMINATED;
-            active_children_count--;
-        } else {
-            status_arr[curr_index] = PROC_RUNNING;
-        }
-        if(active_children_count > 0 && status_arr[curr_index] == PROC_RUNNING) {
-            alarm(TIME_SLICE_SECONDS);
-        } else if (active_children_count == 0) {
-            alarm(0);
-        }
-    } else if (active_children_count > 0) {
-        printf("PARENT ERROR: Children launched but none found schedulable initially!\n");
-        return 1;
-    } else {
-        printf("PARENT: No active children to schedule initially.\n");
-    }
+    printf("PARENT: All children forked. Initializing scheduler.\n");
+    sigalrm_fired = 1; 
 
-
-    printf("PARENT: Entering main scheduling loop. Active children: %d\n", active_children_count);
+    printf("PARENT: Entering scheduling loop. Active children: %d\n", active_children_count);
     while (active_children_count > 0) {
-        if (g_sigalrm_fired) {
-            g_sigalrm_fired = 0;
-            if (active_children_count > 0) {
-                change_process();
-            } else {
-                alarm(0);
-            }
-        }
-
-        if (g_sigchld_fired) {
-            g_sigchld_fired = 0;
+        if (sigchld_fired) {
+            sigchld_fired = 0; 
             handle_terminated_children();
         }
-
-        if (active_children_count > 0 && !g_sigalrm_fired && !g_sigchld_fired) {
+        if (sigalrm_fired) {
+            sigalrm_fired = 0; 
+            if (active_children_count == 0) { 
+                printf("PARENT: All children terminated after SIGCHLD processing. Exiting loop.\n");
+                break;
+            }
+            if (current_running_idx != -1 && process_states[current_running_idx] == PROC_RUNNING) {
+                printf("PARENT: Scheduler: Time slice ended for child (PID: %d). Sending SIGSTOP.\n", pid_arr[current_running_idx]);
+                fflush(stdout);
+                if (kill(pid_arr[current_running_idx], SIGSTOP) == 0) {
+                    process_states[current_running_idx] = PROC_STOPPED;
+                } else {
+                    if (errno == ESRCH) { 
+                        printf("PARENT: Child (PID: %d) already terminated before SIGSTOP could be sent.\n", pid_arr[current_running_idx]);
+                        if(process_states[current_running_idx] != PROC_TERMINATED) {
+                        }
+                    } else {
+                        perror("PARENT: kill (SIGSTOP) failed");
+                    }
+                }
+            }
+            handle_terminated_children();
+            if (active_children_count == 0) {
+                 printf("PARENT: All children terminated during SIGALRM processing. Exiting loop.\n");
+                 break;
+            }
+            select_and_run_next_process();
+        }
+        if (active_children_count > 0) {
             pause();
         }
     }
-
-    printf("PARENT: All children have terminated. MCP exiting.\n");
+    printf("PARENT (PID: %d): All child processes have completed. MCP exiting.\n", getpid());
     return 0;
 }

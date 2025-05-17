@@ -13,7 +13,6 @@
 #define MAX_COMMANDS 1000
 #define TIME_SLICE_SECONDS 1 
 
-
 typedef enum {
     PROC_INITIALIZING, 
     PROC_RUNNING,
@@ -31,7 +30,6 @@ char *command_display_names[MAX_COMMANDS];
 int num_children_launched = 0;
 int current_running_idx = -1;
 int active_children_count = 0;
-
 
 long clk_tck;
 long page_size;
@@ -136,7 +134,6 @@ void display_process_stats() {
     fflush(stdout);
 }
 
-
 void select_and_run_next_process() {
     if (active_children_count == 0) {
         current_running_idx = -1;
@@ -165,7 +162,6 @@ void select_and_run_next_process() {
         }
     }
     
-
     if (next_idx_to_run == -1) {
         for (int i = 0; i < num_children_launched; ++i) {
             if (process_states[i] == PROC_RUNNING) { 
@@ -174,7 +170,6 @@ void select_and_run_next_process() {
             }
         }
     }
-
 
     if (next_idx_to_run != -1) {
         current_running_idx = next_idx_to_run;
@@ -210,7 +205,6 @@ void select_and_run_next_process() {
         }
 
     } else if (active_children_count > 0) {
-       
         if (current_running_idx != -1 && process_states[current_running_idx] == PROC_RUNNING) {
             alarm(TIME_SLICE_SECONDS);
         } else {
@@ -243,7 +237,6 @@ void handle_terminated_children() {
                 break;
             }
         }
-
         if (found_idx != -1 && process_states[found_idx] != PROC_TERMINATED) {
         
             process_states[found_idx] = PROC_TERMINATED;
